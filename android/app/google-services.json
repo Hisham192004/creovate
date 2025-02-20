@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "535065746745",
+    "project_id": "opportunity-hub-dacd0",
+    "storage_bucket": "opportunity-hub-dacd0.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:535065746745:android:514ce9445753188dd65ce8",
+        "android_client_info": {
+          "package_name": "com.example.creovate"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyARQUz_JEAPWkjGFTPRvrCUBr7KaYjqXYs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
