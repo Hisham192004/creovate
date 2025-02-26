@@ -1,4 +1,6 @@
 import 'package:creovate/user/homepage.dart';
+import 'package:creovate/user/register.dart'; // Import RegisterPage
+import 'package:creovate/user/user_root_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -23,7 +25,10 @@ class _LoginScreenState extends State<LoginScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Login Successful!")),
       );
-      Navigator.push(context, MaterialPageRoute(builder: (context) => HomeScreen(),));
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => UserRootScreen()),
+      );
     } on FirebaseAuthException catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(e.message ?? "Login Failed")),
@@ -43,7 +48,7 @@ class _LoginScreenState extends State<LoginScreen> {
             children: <Widget>[
               SizedBox(height: 20),
               Image.asset(
-                'assets/logo.png',
+                'assets/flutter.png',
                 height: 120,
               ),
               SizedBox(height: 20),
@@ -52,7 +57,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 style: GoogleFonts.poppins(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
-                  color: Colors.blueAccent,
+                  color: Colors.deepPurple,
                 ),
               ),
               SizedBox(height: 30),
@@ -79,7 +84,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     },
                     child: Text(
                       'Forgot Password?',
-                      style: TextStyle(color: Colors.blueAccent),
+                      style: TextStyle(color: Colors.deepPurple),
                     ),
                   ),
                 ],
@@ -87,17 +92,21 @@ class _LoginScreenState extends State<LoginScreen> {
               SizedBox(height: 20),
               ElevatedButton(
                 onPressed: _login,
-                child: Text(
-                  'Login',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
                 style: ElevatedButton.styleFrom(
                   padding: EdgeInsets.symmetric(vertical: 16, horizontal: 100),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(30),
                   ),
-                  backgroundColor: Colors.blueAccent,
+                  backgroundColor: Colors.deepPurple,
                   elevation: 5,
+                ),
+                child: Text(
+                  'Login',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
                 ),
               ),
               SizedBox(height: 20),
@@ -107,11 +116,14 @@ class _LoginScreenState extends State<LoginScreen> {
                   Text("Don't have an account? "),
                   TextButton(
                     onPressed: () {
-                      print('Sign Up');
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => RegisterPage()),
+                      );
                     },
                     child: Text(
                       'Register',
-                      style: TextStyle(color: Colors.blueAccent, fontWeight: FontWeight.bold),
+                      style: TextStyle(color: Colors.deepPurple, fontWeight: FontWeight.bold),
                     ),
                   ),
                 ],
@@ -123,21 +135,35 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _buildTextField(TextEditingController controller, String label, IconData icon, {bool isPassword = false, bool isEmail = false}) {
+  Widget _buildTextField(TextEditingController controller, String label, IconData icon,
+      {bool isPassword = false, bool isEmail = false}) {
     return TextField(
       controller: controller,
-      obscureText: isPassword,
+      obscureText: isPassword ? _obscurePassword : false,
       keyboardType: isEmail ? TextInputType.emailAddress : TextInputType.text,
       decoration: InputDecoration(
         labelText: label,
         filled: true,
         fillColor: Colors.grey[200],
-        prefixIcon: Icon(icon, color: Colors.blueAccent),
+        prefixIcon: Icon(icon, color: Colors.deepPurple),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(15),
           borderSide: BorderSide.none,
         ),
         contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+        suffixIcon: isPassword
+            ? IconButton(
+                icon: Icon(
+                  _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                  color: Colors.deepPurple,
+                ),
+                onPressed: () {
+                  setState(() {
+                    _obscurePassword = !_obscurePassword;
+                  });
+                },
+              )
+            : null,
       ),
     );
   }

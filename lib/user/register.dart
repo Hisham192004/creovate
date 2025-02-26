@@ -1,3 +1,4 @@
+import 'package:creovate/user/loginscreen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -19,17 +20,20 @@ class _RegisterPageState extends State<RegisterPage> {
   final TextEditingController _interestsController = TextEditingController();
 
   bool _isLoading = false;
+  bool _isPasswordVisible = false;
+  bool _isConfirmPasswordVisible = false;
 
   Future<void> _register() async {
     if (!_formKey.currentState!.validate()) return;
 
     setState(() => _isLoading = true);
+
     try {
       UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
-      
+
       await FirebaseFirestore.instance.collection('users').doc(userCredential.user!.uid).set({
         'name': _nameController.text.trim(),
         'age': int.parse(_ageController.text.trim()),
@@ -41,22 +45,48 @@ class _RegisterPageState extends State<RegisterPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Registration Successful!")),
       );
-      Navigator.pop(context);
-    } on FirebaseAuthException catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.message ?? "Registration Failed")),
+
+      setState(() => _isLoading = false);
+
+      // Navigate to login page after success
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => LoginScreen()),
       );
+    } on FirebaseAuthException catch (e) {
+      setState(() => _isLoading = false);
+
+      if (e.code == 'email-already-in-use') {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Email already registered! Redirecting to Login...")),
+        );
+
+        // Delay for better UX before navigating
+        await Future.delayed(Duration(seconds: 2));
+
+        // Navigate to Login screen
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => LoginScreen()),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.message ?? "Registration Failed")),
+        );
+      }
     }
-    setState(() => _isLoading = false);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Register", style: GoogleFonts.poppins(fontWeight: FontWeight.w600)),
+        title: Text(
+          "Register",
+          style: GoogleFonts.poppins(fontWeight: FontWeight.w600, color: Colors.white),
+        ),
         centerTitle: true,
-        backgroundColor: Colors.blueGrey,
+        backgroundColor: Colors.deepPurple,
         elevation: 0,
       ),
       body: SingleChildScrollView(
@@ -69,23 +99,41 @@ class _RegisterPageState extends State<RegisterPage> {
               _buildTextField(_ageController, "Age", Icons.cake, isNumber: true),
               _buildTextField(_phoneController, "Phone Number", Icons.phone, isNumber: true),
               _buildTextField(_emailController, "Email", Icons.email, isEmail: true),
-              _buildTextField(_passwordController, "Password", Icons.lock, isPassword: true),
-              _buildTextField(_confirmPasswordController, "Confirm Password", Icons.lock, isPassword: true, isConfirm: true),
+              _buildTextField(_passwordController, "Password", Icons.lock, isPassword: true, isPasswordField: true),
+              _buildTextField(_confirmPasswordController, "Confirm Password", Icons.lock, isPassword: true, isConfirm: true, isPasswordField: true),
               _buildTextField(_interestsController, "Interested Areas", Icons.interests),
               SizedBox(height: 20),
+
+              // Register Button
               _isLoading
                   ? Center(child: CircularProgressIndicator())
                   : ElevatedButton(
                       onPressed: _register,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blueAccent,
+                        backgroundColor: Colors.deepPurple,
                         padding: EdgeInsets.symmetric(vertical: 14, horizontal: 80),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30),
                         ),
                       ),
-                      child: Text("Register", style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.bold)),
+                      child: Text("Register", style: GoogleFonts.poppins(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold)),
                     ),
+
+              SizedBox(height: 10),
+
+              // Login Button
+              TextButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => LoginScreen()),
+                  );
+                },
+                child: Text(
+                  "Already have an account? Login",
+                  style: GoogleFonts.poppins(fontSize: 16, color: Colors.deepPurple, fontWeight: FontWeight.w500),
+                ),
+              ),
             ],
           ),
         ),
@@ -93,22 +141,43 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
-  Widget _buildTextField(TextEditingController controller, String label, IconData icon, {bool isPassword = false, bool isNumber = false, bool isEmail = false, bool isConfirm = false}) {
+  Widget _buildTextField(TextEditingController controller, String label, IconData icon, {bool isPassword = false, bool isNumber = false, bool isEmail = false, bool isConfirm = false, bool isPasswordField = false}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: TextFormField(
         controller: controller,
-        obscureText: isPassword,
+        obscureText: isPasswordField
+            ? (label == "Password" ? !_isPasswordVisible : !_isConfirmPasswordVisible)
+            : false,
         keyboardType: isNumber ? TextInputType.number : isEmail ? TextInputType.emailAddress : TextInputType.text,
         decoration: InputDecoration(
           labelText: label,
           labelStyle: GoogleFonts.poppins(),
-          prefixIcon: Icon(icon, color: Colors.blueAccent),
+          prefixIcon: Icon(icon, color: Colors.deepPurple),
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
           focusedBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.blueAccent, width: 2.0),
+            borderSide: BorderSide(color: Colors.deepPurple, width: 2.0),
             borderRadius: BorderRadius.circular(12),
           ),
+          suffixIcon: isPasswordField
+              ? IconButton(
+                  icon: Icon(
+                    label == "Password"
+                        ? (_isPasswordVisible ? Icons.visibility : Icons.visibility_off)
+                        : (_isConfirmPasswordVisible ? Icons.visibility : Icons.visibility_off),
+                    color: Colors.deepPurple,
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      if (label == "Password") {
+                        _isPasswordVisible = !_isPasswordVisible;
+                      } else {
+                        _isConfirmPasswordVisible = !_isConfirmPasswordVisible;
+                      }
+                    });
+                  },
+                )
+              : null,
         ),
         validator: (value) {
           if (value == null || value.isEmpty) return "Enter your $label";

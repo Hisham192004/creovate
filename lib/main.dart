@@ -1,7 +1,7 @@
+import 'package:creovate/choose_screen.dart';
 import 'package:creovate/user/register.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:creovate/user/admin.dart';
 import 'package:creovate/user/homepage.dart';
 import 'package:creovate/user/loginscreen.dart';
 
@@ -30,7 +30,7 @@ class MyApp extends StatelessWidget {
           } else if (snapshot.hasError) {
             return const Center(child: Text("Error initializing Firebase"));
           }
-          return LoginScreen(); // Show login screen when Firebase is ready
+          return ChooseScreen(); // Show login screen when Firebase is ready
         },
       ),
     );
