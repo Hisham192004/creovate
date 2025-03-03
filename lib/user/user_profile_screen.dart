@@ -1,7 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:creovate/user/loginscreen.dart';
+import 'package:creovate/user/user_feedback_screen.dart';
+import 'package:creovate/user/user_complaint_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -20,7 +23,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
     if (user == null) return;
 
     try {
-      DocumentSnapshot snapshot = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
+      DocumentSnapshot snapshot =
+          await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
       if (snapshot.exists) {
         setState(() {
           userData = snapshot.data() as Map<String, dynamic>;
@@ -38,7 +42,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
     try {
       await FirebaseFirestore.instance.collection('users').doc(user.uid).update(userData);
       setState(() => _isEditing = false);
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Profile updated successfully!")));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Profile updated successfully!", style: TextStyle(color: Colors.white)),
+          backgroundColor: Colors.green,
+        ),
+      );
     } catch (e) {
       debugPrint("Error updating profile: $e");
     }
@@ -46,10 +55,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Future<void> _logout() async {
     await FirebaseAuth.instance.signOut();
-   Navigator.push(
-    context,
-    MaterialPageRoute(builder: (context) => LoginScreen()), // Redirect to login screen
-  );// Redirect to login screen
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => LoginScreen()),
+    );
   }
 
   @override
@@ -61,79 +70,112 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
-        title: Text("Profile"),
-        backgroundColor: Colors.deepPurple,
+        title: Text(
+          "PROFILE",
+          style: GoogleFonts.poppins(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
+        ),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
         actions: [
           if (!_isEditing)
             IconButton(
-              icon: Icon(Icons.edit),
+              icon: Icon(Icons.edit, color: Colors.white),
               onPressed: () => setState(() => _isEditing = true),
             ),
           IconButton(
-            icon: Icon(Icons.logout),
+            icon: Icon(Icons.logout, color: Colors.white),
             onPressed: _logout,
           ),
         ],
       ),
-      body: userData.isEmpty
-          ? Center(child: CircularProgressIndicator())
-          : SingleChildScrollView(
-              padding: EdgeInsets.all(16),
-              child: Card(
-                elevation: 6,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                child: Padding(
-                  padding: EdgeInsets.all(20),
+      body: Stack(
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Colors.deepPurple.shade900,
+                  Colors.deepPurple.shade700,
+                  Colors.deepPurple.shade500,
+                ],
+              ),
+            ),
+          ),
+          userData.isEmpty
+              ? Center(child: CircularProgressIndicator(color: Colors.white))
+              : SingleChildScrollView(
+                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 80),
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Center(
+                      Align(
+                        alignment: Alignment.center,
                         child: CircleAvatar(
-                          radius: 50,
-                          backgroundColor: Colors.deepPurple,
-                          child: Icon(Icons.person, size: 50, color: Colors.white),
+                          radius: 65,
+                          backgroundColor: Colors.white.withOpacity(0.2),
+                          child: Icon(Icons.person, size: 70, color: Colors.white),
                         ),
                       ),
-                      SizedBox(height: 20),
-                      Form(
-                        key: _formKey,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            _buildTextField("Name", "name"),
-                            _buildTextField("Email", "email", enabled: false),
-                            _buildTextField("Phone", "phone"),
-                            _buildTextField("Age", "age"),
-                            _buildTextField("Interests", "interests"),
-                          ],
-                        ),
-                      ),
-                      SizedBox(height: 20),
-                      if (_isEditing)
-                        Center(
-                          child: ElevatedButton(
-                            onPressed: _updateUserData,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.deepPurple,
-                              padding: EdgeInsets.symmetric(vertical: 12, horizontal: 30),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                            ),
-                            child: Text("Save", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
+                      SizedBox(height: 25),
+                      Card(
+                        elevation: 8,
+                        color: Colors.white.withOpacity(0.1),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                        child: Padding(
+                          padding: EdgeInsets.all(25),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              _buildTextField("Name", "name"),
+                              _buildTextField("Email", "email", enabled: false),
+                              _buildTextField("Phone", "phone"),
+                              _buildTextField("Age", "age"),
+                              _buildTextField("Interests", "interests"),
+                            ],
                           ),
                         ),
+                      ),
                       SizedBox(height: 20),
-                      Center(
-                        child: TextButton(
-                          onPressed: _logout,
-                          child: Text("Logout", style: TextStyle(fontSize: 16, color: Colors.red)),
-                        ),
+                      TextButton(
+                        onPressed: _logout,
+                        child: Text("Logout", style: TextStyle(fontSize: 16, color: Colors.redAccent)),
+                      ),
+                      SizedBox(height: 10),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          ElevatedButton(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => FeedbackPage()),
+                              );
+                            },
+                            style: ElevatedButton.styleFrom(backgroundColor: Colors.blueAccent),
+                            child: Text("Feedback", style: TextStyle(color: Colors.white, fontSize: 16)),
+                          ),
+                          SizedBox(width: 10),
+                          ElevatedButton(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => ComplaintPage()),
+                              );
+                            },
+                            style: ElevatedButton.styleFrom(backgroundColor: Colors.orangeAccent),
+                            child: Text("Complaints", style: TextStyle(color: Colors.white, fontSize: 16)),
+                          ),
+                        ],
                       ),
                     ],
                   ),
                 ),
-              ),
-            ),
+        ],
+      ),
     );
   }
 
@@ -145,11 +187,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
         enabled: _isEditing && enabled,
         onChanged: (value) => userData[key] = value,
         validator: (value) => value == null || value.isEmpty ? "This field can't be empty" : null,
+        style: TextStyle(color: Colors.white),
         decoration: InputDecoration(
           labelText: label,
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+          labelStyle: TextStyle(color: Colors.white70),
           filled: true,
-          fillColor: Colors.grey[200],
+          fillColor: Colors.white.withOpacity(0.1),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide.none,
+          ),
         ),
       ),
     );

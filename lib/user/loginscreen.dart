@@ -1,9 +1,8 @@
-import 'package:creovate/user/homepage.dart';
-import 'package:creovate/user/register.dart'; // Import RegisterPage
-import 'package:creovate/user/user_root_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:creovate/user/register.dart';
+import 'package:creovate/user/user_root_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -23,7 +22,10 @@ class _LoginScreenState extends State<LoginScreen> {
         password: _passwordController.text.trim(),
       );
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Login Successful!")),
+        SnackBar(
+          content: Text("Login Successful!"),
+          backgroundColor: Colors.green,
+        ),
       );
       Navigator.pushReplacement(
         context,
@@ -31,7 +33,10 @@ class _LoginScreenState extends State<LoginScreen> {
       );
     } on FirebaseAuthException catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.message ?? "Login Failed")),
+        SnackBar(
+          content: Text(e.message ?? "Login Failed"),
+          backgroundColor: Colors.red,
+        ),
       );
     }
   }
@@ -39,131 +44,203 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(20.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              SizedBox(height: 20),
-              Image.asset(
-                'assets/flutter.png',
-                height: 120,
-              ),
-              SizedBox(height: 20),
-              Text(
-                'CREOVATE',
-                style: GoogleFonts.poppins(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.deepPurple,
-                ),
-              ),
-              SizedBox(height: 30),
-              _buildTextField(_emailController, "Email or Username", Icons.email, isEmail: true),
-              SizedBox(height: 16),
-              _buildTextField(_passwordController, "Password", Icons.lock, isPassword: true),
-              SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Checkbox(
-                    value: _rememberMe,
-                    onChanged: (bool? value) {
-                      setState(() {
-                        _rememberMe = value!;
-                      });
-                    },
-                  ),
-                  Text('Remember Me'),
-                  Spacer(),
-                  TextButton(
-                    onPressed: () {
-                      print('Forgot Password');
-                    },
-                    child: Text(
-                      'Forgot Password?',
-                      style: TextStyle(color: Colors.deepPurple),
-                    ),
-                  ),
+      body: Stack(
+        children: [
+          // Background Gradient
+          Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Colors.deepPurple.shade900,
+                  Colors.deepPurple.shade700,
+                  Colors.deepPurple.shade500,
                 ],
               ),
-              SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: _login,
-                style: ElevatedButton.styleFrom(
-                  padding: EdgeInsets.symmetric(vertical: 16, horizontal: 100),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                  backgroundColor: Colors.deepPurple,
-                  elevation: 5,
-                ),
-                child: Text(
-                  'Login',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-              SizedBox(height: 20),
-              Row(
+            ),
+          ),
+
+          Center(
+            child: SingleChildScrollView(
+              padding: EdgeInsets.all(20.0),
+              child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text("Don't have an account? "),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => RegisterPage()),
-                      );
-                    },
-                    child: Text(
-                      'Register',
-                      style: TextStyle(color: Colors.deepPurple, fontWeight: FontWeight.bold),
+                  // Logo
+                  Container(
+                    padding: EdgeInsets.all(15),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.white.withOpacity(0.1),
+                    ),
+                    child: Icon(Icons.lock, size: 80, color: Colors.white),
+                  ),
+                  SizedBox(height: 10),
+
+                  Text(
+                    'Login to CREOVATE',
+                    style: GoogleFonts.poppins(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                  SizedBox(height: 10),
+
+                  // Glassmorphic Login Card
+                  Container(
+                    padding: EdgeInsets.all(25),
+                    margin: EdgeInsets.symmetric(horizontal: 16), // ✅ Adjusted margin to avoid overflow
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.15),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: Colors.white.withOpacity(0.3)),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black26,
+                          blurRadius: 12,
+                          spreadRadius: 1,
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      children: [
+                        _buildTextField(_emailController, "Email or Username", Icons.email, isEmail: true),
+                        SizedBox(height: 16),
+                        _buildTextField(_passwordController, "Password", Icons.lock, isPassword: true),
+                        SizedBox(height: 16),
+
+                        // ✅ Fixed Overflow in Row
+                        Container(
+                          width: double.infinity,
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Row(
+                                  children: [
+                                    Checkbox(
+                                      value: _rememberMe,
+                                      activeColor: Colors.orange,
+                                      onChanged: (bool? value) {
+                                        setState(() {
+                                          _rememberMe = value!;
+                                        });
+                                      },
+                                    ),
+                                    Text(
+                                      'Remember Me',
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              // ✅ Prevent overflow using Flexible
+                              Flexible(
+                                child: TextButton(
+                                  onPressed: () {},
+                                  child: Text(
+                                    'Forgot Password?',
+                                    style: TextStyle(color: Colors.orange),
+                                    overflow: TextOverflow.ellipsis, // ✅ Prevents overflow
+                                    softWrap: false,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        SizedBox(height: 20),
+
+                        // ✅ Fixed Button Width to avoid overflow
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.8, // ✅ Responsive width
+                          child: ElevatedButton(
+                            onPressed: _login,
+                            style: ElevatedButton.styleFrom(
+                              padding: EdgeInsets.symmetric(vertical: 16),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                              backgroundColor: Colors.orange,
+                              elevation: 5,
+                            ),
+                            child: Text(
+                              'Login',
+                              style: GoogleFonts.poppins(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 20),
+
+                        // Register Button
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text("Don't have an account?", style: TextStyle(color: Colors.white)),
+                            TextButton(
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => RegisterPage()),
+                                );
+                              },
+                              child: Text(
+                                'Register',
+                                style: TextStyle(color: Colors.orange, fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
                   ),
                 ],
               ),
-            ],
+            ),
           ),
-        ),
+        ],
       ),
     );
   }
 
   Widget _buildTextField(TextEditingController controller, String label, IconData icon,
       {bool isPassword = false, bool isEmail = false}) {
-    return TextField(
-      controller: controller,
-      obscureText: isPassword ? _obscurePassword : false,
-      keyboardType: isEmail ? TextInputType.emailAddress : TextInputType.text,
-      decoration: InputDecoration(
-        labelText: label,
-        filled: true,
-        fillColor: Colors.grey[200],
-        prefixIcon: Icon(icon, color: Colors.deepPurple),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(15),
-          borderSide: BorderSide.none,
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 6.0), // ✅ Adjusted padding to prevent overflow
+      child: TextField(
+        controller: controller,
+        obscureText: isPassword ? _obscurePassword : false,
+        keyboardType: isEmail ? TextInputType.emailAddress : TextInputType.text,
+        style: TextStyle(color: Colors.white),
+        decoration: InputDecoration(
+          labelText: label,
+          labelStyle: TextStyle(color: Colors.white70),
+          filled: true,
+          fillColor: Colors.white.withOpacity(0.2),
+          prefixIcon: Icon(icon, color: Colors.white),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(15),
+            borderSide: BorderSide.none,
+          ),
+          contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+          suffixIcon: isPassword
+              ? IconButton(
+                  icon: Icon(
+                    _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                    color: Colors.white70,
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      _obscurePassword = !_obscurePassword;
+                    });
+                  },
+                )
+              : null,
         ),
-        contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 20),
-        suffixIcon: isPassword
-            ? IconButton(
-                icon: Icon(
-                  _obscurePassword ? Icons.visibility_off : Icons.visibility,
-                  color: Colors.deepPurple,
-                ),
-                onPressed: () {
-                  setState(() {
-                    _obscurePassword = !_obscurePassword;
-                  });
-                },
-              )
-            : null,
       ),
     );
   }

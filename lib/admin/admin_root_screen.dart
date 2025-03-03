@@ -1,3 +1,5 @@
+import 'package:creovate/admin/admin_complaint_screen.dart';
+import 'package:creovate/admin/admin_feedback_screen.dart';
 import 'package:creovate/admin/admin_job_screen.dart';
 import 'package:creovate/admin/admin_users_list_screen.dart';
 import 'package:creovate/user/homepage.dart';
@@ -15,8 +17,8 @@ class _AdminRootScreenState extends State<AdminRootScreen> {
   final List<Widget> _screens = [
     HomeScreen(),
     UserListScreen(),
-    FeedbackScreen(),
-    ComplaintScreen(),
+    FeedbackListPage(),
+    ComplaintListPage(),
     JobManagementScreen(),
   ];
 
@@ -58,19 +60,9 @@ class UserViewScreen extends StatelessWidget {
   }
 }
 
-class FeedbackScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Center(child: Text("Feedback Screen"));
-  }
-}
 
-class ComplaintScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Center(child: Text("Complaint Screen"));
-  }
-}
+
+
 
 class JobScreen extends StatelessWidget {
   @override
