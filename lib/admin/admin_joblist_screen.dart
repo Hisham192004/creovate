@@ -1,6 +1,8 @@
+import 'package:creovate/admin/admin_job_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class JobListScreen extends StatelessWidget {
   final CollectionReference jobsRef = FirebaseFirestore.instance.collection('jobs');
@@ -10,6 +12,19 @@ class JobListScreen extends StatelessWidget {
       await jobsRef.doc(jobId).delete();
     } catch (e) {
       print("Error deleting job: $e");
+    }
+  }
+
+  // Function to open Google Maps
+  Future<void> _openMap(double latitude, double longitude) async {
+    final Uri googleMapsUrl = Uri.parse(
+      'https://www.google.com/maps/search/?api=1&query=$latitude,$longitude',
+    );
+
+    if (await canLaunch(googleMapsUrl.toString())) {
+      await launch(googleMapsUrl.toString());
+    } else {
+      throw 'Could not launch $googleMapsUrl';
     }
   }
 
@@ -38,7 +53,10 @@ class JobListScreen extends StatelessWidget {
             itemBuilder: (context, index) {
               final job = jobs[index];
               final jobId = job.id;
-              final jobData = job.data() as Map<String, dynamic>;
+              final jobData = job.data() as Map<String, dynamic>? ?? {};
+
+              final double latitude = jobData['location']?['latitude'] as double? ?? 0.0;
+              final double longitude = jobData['location']?['longitude'] as double? ?? 0.0;
 
               return Card(
                 margin: EdgeInsets.all(8),
@@ -55,7 +73,7 @@ class JobListScreen extends StatelessWidget {
                         ClipRRect(
                           borderRadius: BorderRadius.circular(8),
                           child: Image.network(
-                            jobData['jobPosterUrl'],
+                            jobData['jobPosterUrl'] as String,
                             width: double.infinity,
                             height: 150,
                             fit: BoxFit.cover,
@@ -63,7 +81,7 @@ class JobListScreen extends StatelessWidget {
                         ),
                       SizedBox(height: 8),
                       Text(
-                        jobData['title'],
+                        jobData['title'] as String? ?? 'No Title',
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -71,7 +89,7 @@ class JobListScreen extends StatelessWidget {
                       ),
                       SizedBox(height: 4),
                       Text(
-                        jobData['description'],
+                        jobData['description'] as String? ?? 'No Description',
                         style: TextStyle(fontSize: 14),
                       ),
                       SizedBox(height: 8),
@@ -80,7 +98,7 @@ class JobListScreen extends StatelessWidget {
                           Icon(Icons.category, size: 16, color: Colors.deepPurple),
                           SizedBox(width: 4),
                           Text(
-                            jobData['category'],
+                            jobData['category'] as String? ?? 'No Category',
                             style: TextStyle(fontSize: 14, color: Colors.grey),
                           ),
                         ],
@@ -91,7 +109,7 @@ class JobListScreen extends StatelessWidget {
                           Icon(Icons.attach_money, size: 16, color: Colors.deepPurple),
                           SizedBox(width: 4),
                           Text(
-                            "Pay: ₹${jobData['pay']}",
+                            "Pay: ₹${jobData['pay'] as String? ?? '0'}",
                             style: TextStyle(fontSize: 14, color: Colors.grey),
                           ),
                         ],
@@ -102,7 +120,7 @@ class JobListScreen extends StatelessWidget {
                           Icon(Icons.calendar_today, size: 16, color: Colors.deepPurple),
                           SizedBox(width: 4),
                           Text(
-                            "Last Date: ${DateFormat('yyyy-MM-dd').format(DateTime.parse(jobData['lastDate']))}",
+                            "Last Date: ${DateFormat('yyyy-MM-dd').format(DateTime.parse(jobData['lastDate'] as String? ?? DateTime.now().toString()))}",
                             style: TextStyle(fontSize: 14, color: Colors.grey),
                           ),
                         ],
@@ -113,10 +131,24 @@ class JobListScreen extends StatelessWidget {
                           Icon(Icons.location_on, size: 16, color: Colors.deepPurple),
                           SizedBox(width: 4),
                           Text(
-                            "Location: ${jobData['location']['latitude']}, ${jobData['location']['longitude']}",
+                            "Location: $latitude, $longitude",
                             style: TextStyle(fontSize: 14, color: Colors.grey),
                           ),
                         ],
+                      ),
+                      SizedBox(height: 8),
+                      // Button to open Google Maps
+                      ElevatedButton(
+                        onPressed: () => _openMap(latitude, longitude),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.deepPurple,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8)),
+                        ),
+                        child: Text(
+                          'Open in Google Maps',
+                          style: TextStyle(color: Colors.white),
+                        ),
                       ),
                       SizedBox(height: 8),
                       Align(
@@ -133,6 +165,18 @@ class JobListScreen extends StatelessWidget {
             },
           );
         },
+      ),
+      // Floating Action Button to add jobs
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          // Navigate to the AddJobScreen
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => JobManagementScreen()),
+          );
+        },
+        backgroundColor: Colors.deepPurple,
+        child: Icon(Icons.add, color: Colors.white),
       ),
     );
   }

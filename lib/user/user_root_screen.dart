@@ -1,5 +1,7 @@
 import 'package:creovate/admin/admin_root_screen.dart';
+import 'package:creovate/user/community_post.dart';
 import 'package:creovate/user/homepage.dart';
+import 'package:creovate/user/my_application_status.dart';
 import 'package:creovate/user/user_profile_screen.dart';
 import 'package:flutter/material.dart';
 
@@ -15,8 +17,8 @@ class _UserRootScreenState extends State<UserRootScreen> {
   // List of Screens
   final List<Widget> _screens = [
     HomeScreen(),
-    Scaffold(),
-    Scaffold(),
+    UserApplicationsScreen(),
+    PostScreen(),
     ProfileScreen(),
   ];
 

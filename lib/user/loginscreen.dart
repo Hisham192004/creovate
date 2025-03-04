@@ -1,3 +1,4 @@
+import 'package:creovate/user/forget_password_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -116,29 +117,13 @@ class _LoginScreenState extends State<LoginScreen> {
                           width: double.infinity,
                           child: Row(
                             children: [
-                              Expanded(
-                                child: Row(
-                                  children: [
-                                    Checkbox(
-                                      value: _rememberMe,
-                                      activeColor: Colors.orange,
-                                      onChanged: (bool? value) {
-                                        setState(() {
-                                          _rememberMe = value!;
-                                        });
-                                      },
-                                    ),
-                                    Text(
-                                      'Remember Me',
-                                      style: TextStyle(color: Colors.white),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              // ✅ Prevent overflow using Flexible
+                              
                               Flexible(
                                 child: TextButton(
-                                  onPressed: () {},
+                                  onPressed: () {
+                                    Navigator.push(context, MaterialPageRoute(builder: (context) => ForgotPasswordScreen()));
+                                   
+                                  },
                                   child: Text(
                                     'Forgot Password?',
                                     style: TextStyle(color: Colors.orange),

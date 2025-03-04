@@ -1,0 +1,2 @@
+/home/irfan/Documents/Pk/creovate/android/app/.cxx/Debug/5i246t6j/x86_64/CMakeFiles/edit_cache.dir
+/home/irfan/Documents/Pk/creovate/android/app/.cxx/Debug/5i246t6j/x86_64/CMakeFiles/rebuild_cache.dir

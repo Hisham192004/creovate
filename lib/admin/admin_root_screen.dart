@@ -1,6 +1,7 @@
 import 'package:creovate/admin/admin_complaint_screen.dart';
 import 'package:creovate/admin/admin_feedback_screen.dart';
 import 'package:creovate/admin/admin_job_screen.dart';
+import 'package:creovate/admin/admin_joblist_screen.dart';
 import 'package:creovate/admin/admin_users_list_screen.dart';
 import 'package:creovate/user/homepage.dart';
 import 'package:flutter/material.dart';
@@ -15,11 +16,11 @@ class _AdminRootScreenState extends State<AdminRootScreen> {
 
   // Screens for each tab
   final List<Widget> _screens = [
-    HomeScreen(),
+    // HomeScreen(),
     UserListScreen(),
     FeedbackListPage(),
     ComplaintListPage(),
-    JobManagementScreen(),
+    JobListScreen(),
   ];
 
   void _onItemTapped(int index) {
@@ -40,7 +41,7 @@ class _AdminRootScreenState extends State<AdminRootScreen> {
         showUnselectedLabels: true,
         type: BottomNavigationBarType.fixed,
         items: [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
+         // BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: "Users"),
           BottomNavigationBarItem(icon: Icon(Icons.feedback), label: "Feedback"),
           BottomNavigationBarItem(icon: Icon(Icons.report), label: "Complaints"),

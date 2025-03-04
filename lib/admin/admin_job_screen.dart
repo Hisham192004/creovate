@@ -1,13 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:creavate/admin/location_selected_on_map.dart';
+import 'package:cloudinary/cloudinary.dart';
+import 'package:creovate/admin/location_selected_on_map.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:cloudinary/cloudinary.dart';
 import 'dart:io';
-import 'package:permission_handler/permission_handler.dart'; // Add this import
+
+import 'package:permission_handler/permission_handler.dart';
 
 class JobManagementScreen extends StatefulWidget {
   @override
@@ -184,7 +185,9 @@ class _JobManagementScreenState extends State<JobManagementScreen> {
         _isLoading = false; // Stop loading
       });
     }
+
   }
+
 
   Future<void> _selectLocationFromMap() async {
     final LatLng? selectedLocation = await Navigator.push(
@@ -239,7 +242,7 @@ class _JobManagementScreenState extends State<JobManagementScreen> {
 
 
 
-TextFormField(
+          TextFormField(
                     controller: _jobTitleController,
                     decoration: InputDecoration(
                       labelText: "Job Title",
@@ -398,16 +401,3 @@ TextFormField(
     );
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
