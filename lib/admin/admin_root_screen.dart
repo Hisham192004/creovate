@@ -1,5 +1,6 @@
 import 'package:creovate/admin/admin_complaint_screen.dart';
 import 'package:creovate/admin/admin_feedback_screen.dart';
+import 'package:creovate/admin/admin_job_application_management.dart';
 import 'package:creovate/admin/admin_job_screen.dart';
 import 'package:creovate/admin/admin_joblist_screen.dart';
 import 'package:creovate/admin/admin_users_list_screen.dart';
@@ -21,6 +22,7 @@ class _AdminRootScreenState extends State<AdminRootScreen> {
     FeedbackListPage(),
     ComplaintListPage(),
     JobListScreen(),
+    AdminJobApplicationsScreen()
   ];
 
   void _onItemTapped(int index) {
@@ -46,6 +48,7 @@ class _AdminRootScreenState extends State<AdminRootScreen> {
           BottomNavigationBarItem(icon: Icon(Icons.feedback), label: "Feedback"),
           BottomNavigationBarItem(icon: Icon(Icons.report), label: "Complaints"),
           BottomNavigationBarItem(icon: Icon(Icons.work), label: "Jobs"),
+          BottomNavigationBarItem(icon: Icon(Icons.work_off_rounded), label: "Jobs"),
         ],
       ),
     );

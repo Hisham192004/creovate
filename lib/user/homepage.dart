@@ -1,3 +1,5 @@
+import 'package:creovate/user/JobMapScreen.dart';
+import 'package:creovate/user/caegory_job_list_screen.dart';
 import 'package:creovate/user/user_job_list_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -84,7 +86,7 @@ class HomePage extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => JobListScreen(selectedCategory: boxNames[index]),
+                        builder: (context) => JobListingScreen(category: boxNames[index],),
                       ),
                     );
                   },
@@ -93,6 +95,27 @@ class HomePage extends StatelessWidget {
             ),
           ),
         ],
+      ),
+      // Floating Action Button for Map
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+         
+    print('kkkkk');
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => JobMapScreen(),
+      ),
+    );
+  },
+ 
+
+          // Navigate to the Map Screen
+          
+        
+        child: Icon(Icons.map, color: Colors.white),
+        backgroundColor: Colors.deepPurple.shade700,
+        elevation: 8,
       ),
     );
   }

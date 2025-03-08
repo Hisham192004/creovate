@@ -26,25 +26,25 @@ class _JobManagementScreenState extends State<JobManagementScreen> {
   final TextEditingController _otherBenefitsController =
       TextEditingController();
 
-  String _selectedCategory = "Dance";
+  String _selectedCategory = "DANCE";
   DateTime? _selectedLastDate;
   Position? _currentPosition;
   File? _jobPosterImage;
   bool _isLoading = false; // Track loading state
 
   final List<String> _categories = [
-    "Dance",
-    "Painting",
-    "Drawing",
-    "Photography",
-    "Graphic Design",
-    "Digital Art",
-    "Music",
-    "Fashion Design",
-    "Interior Design",
-    "Film and Video",
-    "Video Games Design",
-    "Textile Arts"
+    "DANCE",
+    "PAINTING",
+    "DRAWING",
+    "PHOTOGRAPHY",
+    "GRAPHIC DESIGN",
+    "DIGITAL ART",
+    "MUSIC",
+    "FASHION DESIGN",
+    "INTERIOR DESIGN",
+    "FILM AND VIDEO",
+    "VIDEO GAMES DESIGN",
+    "TEXTILE ARTS"
   ];
 
   final ImagePicker _picker = ImagePicker();

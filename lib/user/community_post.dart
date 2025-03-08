@@ -2,6 +2,7 @@ import 'package:creovate/clodinary_upload.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 
 class PostScreen extends StatefulWidget {
   @override
@@ -15,8 +16,10 @@ class _PostScreenState extends State<PostScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Posts'),
+        title: Text('Community Posts', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
         backgroundColor: Colors.blueAccent,
+        elevation: 0,
+        centerTitle: true,
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: _firestore.collection('posts').orderBy('createdAt', descending: true).snapshots(),
@@ -34,56 +37,78 @@ class _PostScreenState extends State<PostScreen> {
               final postId = post.id;
               final postData = post.data() as Map<String, dynamic>;
 
-              return Card(
-                margin: EdgeInsets.all(8),
-                elevation: 4,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Padding(
-                  padding: EdgeInsets.all(16),
+              return GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => CommentScreen(postId: postId),
+                    ),
+                  );
+                },
+                child: Container(
+                  margin: EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.3),
+                        spreadRadius: 2,
+                        blurRadius: 5,
+                        offset: Offset(0, 3),
+                      ),
+                    ],
+                  ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       if (postData['imageUrl'] != null)
                         ClipRRect(
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
                           child: Image.network(
                             postData['imageUrl'],
                             width: double.infinity,
-                            height: 200,
+                            height: 300,
                             fit: BoxFit.cover,
                           ),
                         ),
-                      SizedBox(height: 8),
-                      Text(
-                        postData['text'],
-                        style: TextStyle(fontSize: 16),
-                      ),
-                      SizedBox(height: 8),
-                      Row(
-                        children: [
-                          IconButton(
-                            icon: Icon(
-                              Icons.favorite,
-                              color: postData['isLiked'] ? Colors.red : Colors.grey,
+                      Padding(
+                        padding: EdgeInsets.all(16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              postData['text'],
+                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                             ),
-                            onPressed: () => _handleLike(postId, postData['likes'], postData['isLiked']),
-                          ),
-                          Text('${postData['likes']} Likes'),
-                          Spacer(),
-                          IconButton(
-                            icon: Icon(Icons.comment),
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => CommentScreen(postId: postId),
+                            SizedBox(height: 16),
+                            Row(
+                              children: [
+                                IconButton(
+                                  icon: Icon(
+                                    Icons.favorite,
+                                    color: postData['isLiked'] ? Colors.red : Colors.grey,
+                                  ),
+                                  onPressed: () => _handleLike(postId, postData['likes'], postData['isLiked']),
                                 ),
-                              );
-                            },
-                          ),
-                        ],
+                                Text('${postData['likes']} Likes', style: TextStyle(fontSize: 14, color: Colors.grey)),
+                                Spacer(),
+                                IconButton(
+                                  icon: Icon(Icons.comment, color: Colors.blueAccent),
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => CommentScreen(postId: postId),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
                     ],
                   ),
@@ -95,8 +120,9 @@ class _PostScreenState extends State<PostScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showAddPostDialog(context),
-        child: Icon(Icons.add),
+        child: Icon(Icons.add, color: Colors.white),
         backgroundColor: Colors.blueAccent,
+        elevation: 4,
       ),
     );
   }
@@ -116,13 +142,19 @@ class _PostScreenState extends State<PostScreen> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text('Add a Post'),
+          title: Text('Add a Post', style: TextStyle(fontWeight: FontWeight.bold)),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
                 controller: _postController,
-                decoration: InputDecoration(hintText: 'Write something...'),
+                decoration: InputDecoration(
+                  hintText: 'Write something...',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                maxLines: 3,
               ),
               SizedBox(height: 16),
               ElevatedButton(
@@ -137,18 +169,24 @@ class _PostScreenState extends State<PostScreen> {
                     });
                   }
                 },
-                child: Text('Upload Image'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blueAccent,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: Text('Upload Image', style: TextStyle(color: Colors.white)),
               ),
             ],
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: Text('Cancel'),
+              child: Text('Cancel', style: TextStyle(color: Colors.blueAccent)),
             ),
             TextButton(
               onPressed: () async {
-                if (_postController.text.trim().isNotEmpty) {
+                if (_postController.text.trim().isNotEmpty && _imageUrl != null) {
                   await _firestore.collection('posts').add({
                     'text': _postController.text.trim(),
                     'likes': 0,
@@ -157,9 +195,16 @@ class _PostScreenState extends State<PostScreen> {
                     'createdAt': FieldValue.serverTimestamp(),
                   });
                   Navigator.pop(context);
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Please upload an image before posting.'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
                 }
               },
-              child: Text('Post'),
+              child: Text('Post', style: TextStyle(color: Colors.blueAccent)),
             ),
           ],
         );
@@ -167,9 +212,6 @@ class _PostScreenState extends State<PostScreen> {
     );
   }
 }
-
-
-
 
 class CommentScreen extends StatefulWidget {
   final String postId;
@@ -188,8 +230,10 @@ class _CommentScreenState extends State<CommentScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Comments'),
+        title: Text('Comments', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
         backgroundColor: Colors.blueAccent,
+        elevation: 0,
+        centerTitle: true,
       ),
       body: Column(
         children: [
@@ -214,15 +258,36 @@ class _CommentScreenState extends State<CommentScreen> {
                     final comment = comments[index];
                     final commentData = comment.data() as Map<String, dynamic>;
 
-                    return Card(
+                    return Container(
                       margin: EdgeInsets.all(8),
-                      elevation: 2,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.3),
+                            spreadRadius: 2,
+                            blurRadius: 5,
+                            offset: Offset(0, 3),
+                          ),
+                        ],
                       ),
                       child: Padding(
-                        padding: EdgeInsets.all(12),
-                        child: Text(commentData['text']),
+                        padding: EdgeInsets.all(16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              commentData['text'],
+                              style: TextStyle(fontSize: 16),
+                            ),
+                            SizedBox(height: 8),
+                            Text(
+                              '${DateFormat('MMM d, yyyy – h:mm a').format(commentData['createdAt'].toDate())}',
+                              style: TextStyle(fontSize: 12, color: Colors.grey),
+                            ),
+                          ],
+                        ),
                       ),
                     );
                   },
@@ -242,11 +307,12 @@ class _CommentScreenState extends State<CommentScreen> {
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(20),
                       ),
+                      contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                     ),
                   ),
                 ),
                 IconButton(
-                  icon: Icon(Icons.send),
+                  icon: Icon(Icons.send, color: Colors.blueAccent),
                   onPressed: () => _addComment(widget.postId),
                 ),
               ],

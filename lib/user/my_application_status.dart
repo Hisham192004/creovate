@@ -4,11 +4,21 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 class UserApplicationsScreen extends StatelessWidget {
   final CollectionReference applicationsRef = FirebaseFirestore.instance.collection('applications');
+  final CollectionReference jobsRef = FirebaseFirestore.instance.collection('jobs');
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   @override
   Widget build(BuildContext context) {
-    final userId = _auth.currentUser!.uid;
+    final user = _auth.currentUser;
+
+    if (user == null) {
+      return Scaffold(
+        appBar: AppBar(title: Text("My Applications")),
+        body: Center(child: Text("Please log in to view applications.")),
+      );
+    }
+
+    final userId = user.uid;
 
     return Scaffold(
       appBar: AppBar(
@@ -33,21 +43,43 @@ class UserApplicationsScreen extends StatelessWidget {
             itemBuilder: (context, index) {
               final application = applications[index];
               final applicationData = application.data() as Map<String, dynamic>;
+              final jobId = applicationData['jobId'] as String? ?? 'Unknown Job';
 
-              return Card(
-                margin: EdgeInsets.all(8),
-                elevation: 4,
-                child: Padding(
-                  padding: EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text("Job ID: ${applicationData['jobId']}"),
-                      SizedBox(height: 8),
-                      Text("Status: ${applicationData['status']}"),
-                    ],
-                  ),
-                ),
+              return FutureBuilder<DocumentSnapshot>(
+                future: jobsRef.doc(jobId).get(),
+                builder: (context, jobSnapshot) {
+                  if (!jobSnapshot.hasData || !jobSnapshot.data!.exists) {
+                    return ListTile(
+                      title: Text("Job not found"),
+                      subtitle: Text("Status: ${applicationData['status']}"),
+                    );
+                  }
+
+                  final jobData = jobSnapshot.data!.data() as Map<String, dynamic>;
+
+                  return Card(
+                    margin: EdgeInsets.all(8),
+                    elevation: 4,
+                    child: Padding(
+                      padding: EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            jobData['title'] as String? ?? 'No Title',
+                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          ),
+                          SizedBox(height: 4),
+                          Text(jobData['description'] as String? ?? 'No Description'),
+                          SizedBox(height: 8),
+                          Text("Category: ${jobData['category'] as String? ?? 'N/A'}"),
+                          Text("Pay: ₹${jobData['pay'] as String? ?? '0'}"),
+                          Text("Status: ${applicationData['status']}"),
+                        ],
+                      ),
+                    ),
+                  );
+                },
               );
             },
           );

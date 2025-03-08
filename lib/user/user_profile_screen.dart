@@ -50,6 +50,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
       );
     } catch (e) {
       debugPrint("Error updating profile: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Failed to update profile. Please try again.", style: TextStyle(color: Colors.white)),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
 
@@ -109,69 +115,85 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ? Center(child: CircularProgressIndicator(color: Colors.white))
               : SingleChildScrollView(
                   padding: EdgeInsets.symmetric(horizontal: 16, vertical: 80),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Align(
-                        alignment: Alignment.center,
-                        child: CircleAvatar(
-                          radius: 65,
-                          backgroundColor: Colors.white.withOpacity(0.2),
-                          child: Icon(Icons.person, size: 70, color: Colors.white),
-                        ),
-                      ),
-                      SizedBox(height: 25),
-                      Card(
-                        elevation: 8,
-                        color: Colors.white.withOpacity(0.1),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-                        child: Padding(
-                          padding: EdgeInsets.all(25),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              _buildTextField("Name", "name"),
-                              _buildTextField("Email", "email", enabled: false),
-                              _buildTextField("Phone", "phone"),
-                              _buildTextField("Age", "age"),
-                              _buildTextField("Interests", "interests"),
-                            ],
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Align(
+                          alignment: Alignment.center,
+                          child: CircleAvatar(
+                            radius: 65,
+                            backgroundColor: Colors.white.withOpacity(0.2),
+                            child: Icon(Icons.person, size: 70, color: Colors.white),
                           ),
                         ),
-                      ),
-                      SizedBox(height: 20),
-                      TextButton(
-                        onPressed: _logout,
-                        child: Text("Logout", style: TextStyle(fontSize: 16, color: Colors.redAccent)),
-                      ),
-                      SizedBox(height: 10),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          ElevatedButton(
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (context) => FeedbackPage()),
-                              );
-                            },
-                            style: ElevatedButton.styleFrom(backgroundColor: Colors.blueAccent),
-                            child: Text("Feedback", style: TextStyle(color: Colors.white, fontSize: 16)),
+                        SizedBox(height: 25),
+                        Card(
+                          elevation: 8,
+                          color: Colors.white.withOpacity(0.1),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                          child: Padding(
+                            padding: EdgeInsets.all(25),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                _buildTextField("Name", "name"),
+                                _buildTextField("Email", "email", enabled: false),
+                                _buildTextField("Phone", "phone"),
+                                _buildTextField("Age", "age"),
+                                _buildTextField("Interests", "interests"),
+                              ],
+                            ),
                           ),
-                          SizedBox(width: 10),
+                        ),
+                        SizedBox(height: 20),
+                        if (_isEditing)
                           ElevatedButton(
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (context) => ComplaintPage()),
-                              );
-                            },
-                            style: ElevatedButton.styleFrom(backgroundColor: Colors.orangeAccent),
-                            child: Text("Complaints", style: TextStyle(color: Colors.white, fontSize: 16)),
+                            onPressed: _updateUserData,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.green,
+                              padding: EdgeInsets.symmetric(horizontal: 40, vertical: 12),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            child: Text("Save Changes", style: TextStyle(fontSize: 16, color: Colors.white)),
                           ),
-                        ],
-                      ),
-                    ],
+                        SizedBox(height: 10),
+                        TextButton(
+                          onPressed: _logout,
+                          child: Text("Logout", style: TextStyle(fontSize: 16, color: Colors.redAccent)),
+                        ),
+                        SizedBox(height: 10),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            ElevatedButton(
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => FeedbackPage()),
+                                );
+                              },
+                              style: ElevatedButton.styleFrom(backgroundColor: Colors.blueAccent),
+                              child: Text("Feedback", style: TextStyle(color: Colors.white, fontSize: 16)),
+                            ),
+                            SizedBox(width: 10),
+                            ElevatedButton(
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => ComplaintPage()),
+                                );
+                              },
+                              style: ElevatedButton.styleFrom(backgroundColor: Colors.orangeAccent),
+                              child: Text("Complaints", style: TextStyle(color: Colors.white, fontSize: 16)),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 ),
         ],

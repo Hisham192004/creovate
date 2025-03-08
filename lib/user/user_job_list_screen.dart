@@ -38,6 +38,8 @@ class _JobListScreenState extends State<JobListScreen> {
 
                 var jobs = snapshot.data!.docs;
 
+                print(jobs.first.data());
+
                 // Filter jobs based on selected category and date
                 List<QueryDocumentSnapshot> filteredJobs = jobs.where((job) {
                   var data = job.data() as Map<String, dynamic>;
@@ -47,6 +49,7 @@ class _JobListScreenState extends State<JobListScreen> {
 
                   // Check if job is still valid
                   bool isValid = lastDate.isAfter(DateTime.now());
+                  print(widget.selectedCategory);
 
                   // Apply category filter
                   bool matchesCategory =
