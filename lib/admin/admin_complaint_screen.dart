@@ -12,8 +12,11 @@ class _ComplaintListPageState extends State<ComplaintListPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Complaints"),
+        title: Text("Complaints", style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
         backgroundColor: Colors.deepPurple,
+        centerTitle: true,
+        elevation: 5,
+        shadowColor: Colors.black.withOpacity(0.5),
       ),
       body: StreamBuilder(
         stream: FirebaseFirestore.instance.collection('complaints').orderBy('timestamp', descending: true).snapshots(),
@@ -22,32 +25,51 @@ class _ComplaintListPageState extends State<ComplaintListPage> {
             return Center(child: CircularProgressIndicator());
           }
           if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-            return Center(child: Text("No complaints found."));
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.report_problem, size: 80, color: Colors.grey),
+                  SizedBox(height: 10),
+                  Text("No complaints found", style: TextStyle(fontSize: 18, color: Colors.grey)),
+                ],
+              ),
+            );
           }
           return ListView.builder(
-            padding: EdgeInsets.all(10),
+            padding: EdgeInsets.all(12),
             itemCount: snapshot.data!.docs.length,
             itemBuilder: (context, index) {
               var complaint = snapshot.data!.docs[index];
+              var data = complaint.data() as Map<String, dynamic>;
               return Card(
-                elevation: 4,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                margin: EdgeInsets.symmetric(vertical: 8),
+                elevation: 6,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                shadowColor: Colors.black.withOpacity(0.3),
                 child: ListTile(
-                  title: Text(
-                    complaint['title'],
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  contentPadding: EdgeInsets.all(16),
+                  leading: CircleAvatar(
+                    backgroundColor: Colors.deepPurple,
+                    child: Icon(Icons.warning, color: Colors.white),
                   ),
+                  title: Text(data['title'] ?? "No Title", 
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                   subtitle: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text("Category: ${complaint['category']}", style: TextStyle(fontWeight: FontWeight.w600)),
                       SizedBox(height: 5),
-                      Text("Details: ${complaint['details']}", style: TextStyle(color: Colors.grey[700])),
+                      Text("Category: ${data['category'] ?? 'N/A'}", style: TextStyle(fontWeight: FontWeight.w600)),
                       SizedBox(height: 5),
-                      Text("Submitted: ${DateFormat.yMMMd().add_jm().format(complaint['timestamp'].toDate())}",
-                          style: TextStyle(fontSize: 12, color: Colors.grey)),
+                      Text("Details: ${data['details'] ?? 'No details provided'}", style: TextStyle(color: Colors.grey[700])),
+                      SizedBox(height: 5),
+                      Text(
+                        "Submitted: ${data['timestamp'] != null ? DateFormat.yMMMd().add_jm().format((data['timestamp'] as Timestamp).toDate()) : 'N/A'}",
+                        style: TextStyle(fontSize: 12, color: Colors.grey),
+                      ),
                     ],
                   ),
+                  trailing: Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
                 ),
               );
             },

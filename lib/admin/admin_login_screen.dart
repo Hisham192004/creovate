@@ -10,11 +10,15 @@ class AdminLoginScreen extends StatefulWidget {
 class _AdminLoginScreenState extends State<AdminLoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  final _formKey = GlobalKey<FormState>(); // Form key for validation
+  final _formKey = GlobalKey<FormState>();
   bool _obscurePassword = true;
+  bool _isLoading = false;
 
-  void _login() {
+  void _login() async {
     if (_formKey.currentState!.validate()) {
+      setState(() => _isLoading = true);
+      await Future.delayed(Duration(seconds: 2)); // Simulating network request
+
       String email = _emailController.text.trim();
       String password = _passwordController.text.trim();
 
@@ -37,6 +41,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
           ),
         );
       }
+      setState(() => _isLoading = false);
     }
   }
 
@@ -45,7 +50,6 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
     return Scaffold(
       body: Stack(
         children: [
-          // Gradient Background
           Container(
             decoration: BoxDecoration(
               gradient: LinearGradient(
@@ -59,14 +63,12 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
               ),
             ),
           ),
-
           Center(
             child: SingleChildScrollView(
               padding: EdgeInsets.all(20.0),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // Logo
                   Container(
                     padding: EdgeInsets.all(15),
                     decoration: BoxDecoration(
@@ -76,7 +78,6 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                     child: Icon(Icons.lock, size: 80, color: Colors.white),
                   ),
                   SizedBox(height: 10),
-
                   Text(
                     'Admin Login',
                     style: GoogleFonts.poppins(
@@ -86,8 +87,6 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                     ),
                   ),
                   SizedBox(height: 10),
-
-                  // Glassmorphic Login Box
                   Container(
                     padding: EdgeInsets.all(25),
                     margin: EdgeInsets.symmetric(horizontal: 30),
@@ -111,8 +110,6 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                           SizedBox(height: 16),
                           _buildTextField(_passwordController, "Password", Icons.lock, isPassword: true),
                           SizedBox(height: 20),
-
-                          // Animated Login Button
                           GestureDetector(
                             onTap: _login,
                             child: AnimatedContainer(
@@ -132,14 +129,16 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                                 ],
                               ),
                               child: Center(
-                                child: Text(
-                                  'Login',
-                                  style: GoogleFonts.poppins(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                  ),
-                                ),
+                                child: _isLoading
+                                    ? CircularProgressIndicator(color: Colors.white)
+                                    : Text(
+                                        'Login',
+                                        style: GoogleFonts.poppins(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                        ),
+                                      ),
                               ),
                             ),
                           ),

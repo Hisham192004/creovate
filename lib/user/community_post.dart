@@ -17,7 +17,7 @@ class _PostScreenState extends State<PostScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Community Posts', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-        backgroundColor: Colors.blueAccent,
+        backgroundColor: Colors.deepPurple,
         elevation: 0,
         centerTitle: true,
       ),
@@ -312,7 +312,7 @@ class _CommentScreenState extends State<CommentScreen> {
                   ),
                 ),
                 IconButton(
-                  icon: Icon(Icons.send, color: Colors.blueAccent),
+                  icon: Icon(Icons.send, color: Colors.deepPurple),
                   onPressed: () => _addComment(widget.postId),
                 ),
               ],
